@@ -1,0 +1,193 @@
+!!! 5
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7 ]>
+<html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]>
+<html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]>
+<html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html class="no-js" lang="en"> <!--<![endif]-->
+%head
+  %meta(charset="utf-8")
+  /
+    Always force latest IE rendering engine (even in intranet) & Chrome Frame
+    Remove this if you use .htaccess
+  %meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
+  %title
+    Score Card for Taroky
+  %meta(name="description" content="Score Card for Taroky")
+  %meta(name="author" content="Michal Příhoda")
+
+  / Mobile viewport optimized: j.mp/bplateviewport
+  %meta(name="viewport" content="width=device-width, initial-scale=1.0")
+
+  /
+    Place favicon.ico & apple-touch-icon.png in the root of your domain
+    and delete these references
+  %link(rel="shortcut icon" href="/favicon.ico")
+  %link(rel="apple-touch-icon" href="/apple-touch-icon.png")
+
+  / CSS: implied media="all"
+  %link(rel="stylesheet" href="css/style.css")
+
+  /
+    Uncomment if you are specifically targeting less enabled mobile browsers
+    <link ref="stylesheet" media="handheld" href="css/handheld.css?v=2">
+
+  / All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects
+  %script(src="js/libs/modernizr-1.7.min.js")
+%body
+  #container
+    %header
+      %h1
+        Počítadlo Taroků
+    %section#main
+      #game
+        %ul#game-state
+          %li
+            %h2
+              Hra
+            %select(name="game_type")
+              %option(value="0")
+                Varšava
+              %option(value="1" selected)
+                První
+              %option(value="2")
+                Druhá
+              %option(value="1")
+                Preferans prvá
+              %option(value="2")
+                Preferans druhá
+              %option(value="3")
+                Preferans třetí
+              %option(value="4")
+                Sólo
+            %select#game_flek.flek
+              %option(value="1")
+                1x
+              %option(value="2")
+                2x
+              %option(value="4")
+                4x
+              %option(value="8")
+                8x
+              %option(value="16")
+                16x
+          %li
+            %h2
+              Valát
+            %select#valat.zavazujici
+              %option(value="1")
+                Pro
+              %option(value="0" selected)
+                Bez
+              %option(value="-1")
+                Proti
+            %select#valat_flek
+              %option(value="1")
+                1x
+              %option(value="2")
+                2x
+              %option(value="4")
+                4x
+              %option(value="8")
+                8x
+              %option(value="16")
+                16x
+          %li
+            %h2
+              Pagát
+            %select#pagat.zavazujici
+              %option(value="1")
+                Pro
+              %option(value="0" selected)
+                Bez
+              %option(value="-1")
+                Proti
+            %select#pagat_flek
+              %option(value="1")
+                1x
+              %option(value="2")
+                2x
+              %option(value="4")
+                4x
+              %option(value="8")
+                8x
+              %option(value="16")
+                16x
+            %input#pagat_uhrany(type="checkbox" value="pagat_uhrany")
+              Uhraný
+          %li
+            %h2
+              Skóre ze hry
+            %input#game_result(type="text" value="0")
+            %input#process(type="button" value="Spočítej")
+          %li
+            %h2
+              Akce
+            %input#reset(type="reset" value="Reset")
+            %input#session_reset(type="reset" value="New")
+      #players
+        %ul#player-list
+          %li#jew
+    %footer
+      &copy; 2011 Michal Příhoda
+  %script#player-template(type="text/template")
+    %input.renonc(type="button" value="R")
+    %select.hlasky
+      %option(value="0")
+        0
+      %option(value="5")
+        5
+      %option(value="10")
+        10
+      %option(value="15")
+        15
+      %option(value="20")
+        20
+    %span.player-game-score
+      <%= game_score %>
+    %span.player-score
+      <%= score %>
+    <input class="licitator" type="checkbox" <%= licitator ? 'checked="checked"' : '' %> />
+    .player-name
+      .display
+      .edit
+        %input.player-name-input(type="text" value="")
+  %script#jew-template(type="text/template")
+    %span.game-score
+      <%= game_score %>
+    %span.player-score
+      <%= score %>
+    %span.player-name
+      Jew
+  / JavaScript at the bottom for fast page loading
+
+  / Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary
+  %script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js")
+  %script
+    window.jQuery || document.write("<script src='js/libs/jquery-1.5.1.min.js'>\x3C/script>")
+
+  / Additional libraries
+  %script(src="js/mylibs/underscore.js")
+  %script(src="js/mylibs/backbone.js")
+  %script(src="js/mylibs/backbone-localstorage.js")
+
+  / scripts concatenated and minified via ant build script
+  %script(src="js/plugins.js")
+  %script(src="js/script.js")
+
+  /[if lt IE 7]
+    %script(src="js/libs/dd_belatedpng.js")
+    %script
+      DD_belatedPNG.fix("img, .png_bg"); // Fix any <img> or .png_bg bg-images. Also, please read goo.gl/mZiyb
+
+  / mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID
+  %script
+    var _gaq=[["_setAccount","UA-XXXXX-X"],["_trackPageview"]];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+    g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
+    s.parentNode.insertBefore(g,s)}(document,"script"));
+
+</html>

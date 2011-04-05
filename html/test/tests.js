@@ -17,25 +17,25 @@ test("Environment is good",function(){
   ok( !!window.log, "log function present");
   
   var history = log.history && log.history.length || 0;
-  log("logging from the test suite.")
-  equals( log.history.length - history, 1, "log history keeps track" )
+  log("logging from the test suite.");
+  equals( log.history.length - history, 1, "log history keeps track" );
   
-  ok( !!window.Modernizr, "Modernizr global is present")
+  ok( !!window.Modernizr, "Modernizr global is present");
 });
 
 module("session tests");
 test("Session has 4 players upon creation", function() {
     expect(1);
-    var session = new Session;
-    equals(session.players.length, 4, "Session has 4 players.");
+    var players = new PlayerList();
+    players.fetch();
+    equals(players.length, 4, "Session should have 4 players.");
 });
 
 module("player tests");
 test("Player has zero score upon creation", function() {
     expect(1);
-    var player = new Player;
-    equals(player.get("score"), 0, "Player has 0 score, indeed.");
-})
-
+    var player = new Player();
+    equals(player.get("score"), 0, "Player should have 0 score.");
+});
 
 
