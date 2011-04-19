@@ -117,7 +117,7 @@
               %option(value="16")
                 16x
             %input#pagat_uhrany(type="checkbox" value="pagat_uhrany")
-              Uhraný
+            Uhraný
           %li
             %h2
               Skóre ze hry
@@ -146,8 +146,6 @@
         15
       %option(value="20")
         20
-    %span.player-game-score
-      <%= game_score %>
     %span.player-score
       <%= score %>
     <input class="licitator" type="checkbox" <%= licitator ? 'checked="checked"' : '' %> />
@@ -155,9 +153,8 @@
       .display
       .edit
         %input.player-name-input(type="text" value="")
+    .score-details
   %script#jew-template(type="text/template")
-    %span.game-score
-      <%= game_score %>
     %span.player-score
       <%= score %>
     %span.player-name
