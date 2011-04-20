@@ -48,20 +48,20 @@
           %li
             %h2
               Hra
-            %select(name="game_type")
-              %option(value="0")
+            %select#game_type
+              %option(value="0-1")
                 Varšava
-              %option(value="1" selected)
+              %option(value="1-1")
                 První
-              %option(value="2")
+              %option(value="2-2")
                 Druhá
-              %option(value="1")
+              %option(value="3-1")
                 Preferans prvá
-              %option(value="2")
+              %option(value="3-2")
                 Preferans druhá
-              %option(value="3")
+              %option(value="3-3")
                 Preferans třetí
-              %option(value="4")
+              %option(value="4-4")
                 Sólo
             %select#game_flek.flek
               %option(value="1")
@@ -80,7 +80,7 @@
             %select#valat.zavazujici
               %option(value="1")
                 Pro
-              %option(value="0" selected)
+              %option(value="0")
                 Bez
               %option(value="-1")
                 Proti
@@ -101,7 +101,7 @@
             %select#pagat.zavazujici
               %option(value="1")
                 Pro
-              %option(value="0" selected)
+              %option(value="0")
                 Bez
               %option(value="-1")
                 Proti
@@ -116,8 +116,13 @@
                 8x
               %option(value="16")
                 16x
-            %input#pagat_uhrany(type="checkbox" value="pagat_uhrany")
-            Uhraný
+            %select#pagat_uhrany
+              %option(value="1")
+                Pro
+              %option(value="0")
+                Ne
+              %option(value="-1")
+                Proti
           %li
             %h2
               Skóre ze hry
@@ -146,6 +151,8 @@
         15
       %option(value="20")
         20
+    %span.game-score
+      <%= game_score %>
     %span.player-score
       <%= score %>
     <input class="licitator" type="checkbox" <%= licitator ? 'checked="checked"' : '' %> />

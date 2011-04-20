@@ -8,17 +8,45 @@ $ ->
       revealing: 0
       score: 0
 
-    licitator: ->
-      @get("licitator")
+    _game_score: 0
+
+    licitator: (v) ->
+      if v?
+        @set({"licitator": v})
+      else
+        @get("licitator")
 
     score: ->
       @get("score")
+
+    game_score: (s) ->
+      if s?
+        @_game_score = s
+        @change()
+      else
+        @_game_score
+
+    toRender: ->
+      x = @toJSON()
+      x['game_score'] = @game_score()
+      x
 
     revealing: ->
       @get("revealing")
 
     addScore: (score) ->
-      @set({"score": @get("score") + score})
+      @save({"score": @get("score") + score})
+
+    reset: ->
+      @game_score(0)
+      @licitator(false)
+      @set
+        revealing: 0
+
+    sessionReset: ->
+      @reset()
+      @set
+        score: 0
 
   class window.PlayerSlots extends Backbone.Collection
 
@@ -61,14 +89,17 @@ $ ->
       "click div.player-name": "edit"
       "keypress .player-name-input": "updateOnEnter"
       "click .renonc": "renonc"
+      "change .licitator": "toggleLicitator"
+      "change .hlasky": "updateHlasky"
 
     initialize: ->
       @model.bind("change", @render)
       @model.view = @
 
     render: =>
-      $(@el).html(@template(@model.toJSON()))
+      $(@el).html(@template(@model.toRender()))
       @setName()
+      @setHlasky()
       @
 
     setName: ->
@@ -77,6 +108,16 @@ $ ->
       @input = @$ '.player-name-input'
       @input.bind 'blur', @close
       @input.val name
+
+    setHlasky: ->
+      @$('.hlasky').val @model.get("revealing")
+
+    toggleLicitator: ->
+      @model.licitator(!@model.licitator())
+
+    updateHlasky: ->
+      @model.save
+        revealing: parseInt(@$('.hlasky').val())
 
     edit: ->
       $(@el).addClass "editing"
@@ -98,6 +139,9 @@ $ ->
     localStorage: new Store("game")
 
     defaults:
+      # Game "name", eg. 0 - Varsava, 1 - Prvni, 2 - Druha, 3 - Preferans, 4 - Solo
+      game_name: 1
+      # Game "type", means game value, times
       game_type: 1
       flek: 1
       # Valat announced: 0 - no announcements, 1 - licitator, -1 - anti-licitator team
@@ -190,6 +234,14 @@ $ ->
       else
         [0, 0]
 
+    reset: ->
+      @save({"result": 0})
+      @slots.each (p) -> p.reset()
+
+    sessionReset: ->
+      @reset()
+      @slots.each (p) -> p.sessionReset()
+
     # TODO: bind game props to form elements
 
   class window.GameView extends Backbone.View
@@ -199,10 +251,19 @@ $ ->
       "click #reset": "reset"
       "click #session_reset": "sessionReset"
       "click #process": "process"
+      "change #game_result": "setResult"
+      "change #game_type": "setGameType"
+      "change #game_flek": "setGameFlek"
+      "change #valat": "setValat"
+      "change #valat_flek": "setValatFlek"
+      "change #pagat": "setPagat"
+      "change #pagat_flek": "setPagatFlek"
+      "change #pagat_uhrany": "setPagatUhrany"
 
     initialize: ->
       slots = new PlayerSlots()
       game = new Game()
+      game.id = "Main"
       game.slots = slots
       @game = game
 
@@ -216,7 +277,16 @@ $ ->
 
     render: =>
       @$("#jew").html(@jew_template
-        'score': -@playerScore())
+        score: -@playerScore()
+      )
+      gt = @renderGameType([@game.get("game_name"), @game.get("game_type")])
+      @$("#game_type").val(gt)
+      @$("#game_result").val(@game.get("result"))
+      @$("#valat").val(@game.get("valat"))
+      @$("#valat_flek").val(@game.get("valat_flek"))
+      @$("#pagat").val(@game.get("pagat"))
+      @$("#pagat_flek").val(@game.get("pagat_flek"))
+      @$("#pagat_uhrany").val(@game.get("pagat_played"))
 
     addPlayer: (p) =>
       view = new PlayerSlotView
@@ -236,13 +306,55 @@ $ ->
       sum
 
     process: ->
-      @game.slots.each (p) -> p.setGameScore(10)
+      result = @game.game_score()
+      for i in [0..3]
+        @game.slots.at(i).game_score(result[i])
 
     reset: ->
-      @game.slots.each (p) -> p.reset()
+      @game.reset()
 
     sessionReset: ->
-      @game.slots.each (p) -> p.sessionReset()
+      @game.sessionReset()
 
+    valToGameInt: (fid, key) ->
+      v = parseInt(@$("##{ fid }").val())
+      k = if key? then key else fid
+      s = {}
+      s[k] = v
+      @game.save s
+
+    setResult: ->
+      @valToGameInt("game_result", "result")
+
+    renderGameType: (v) ->
+      v[0] + "-" + v[1]
+
+    parseGameType: (v) ->
+      _.map(v.split("-", 2), (x) -> parseInt(x))
+
+    setGameType: ->
+      [g, t] = @parseGameType(@$("#game_type").val())
+      @game.save(
+        game_name: g
+        game_type: t
+      )
+
+    setGameFlek: ->
+      @valToGameInt("game_flek", "flek")
+
+    setValat: ->
+      @valToGameInt("valat")
+
+    setValatFlek: ->
+      @valToGameInt("valat_flek")
+
+    setPagat: ->
+      @valToGameInt("pagat")
+
+    setPagatFlek: ->
+      @valToGameInt("pagat_flek")
+
+    setPagatUhrany: ->
+      @valToGameInt("pagat_uhrany", "pagat_played")
 
   window.session = new GameView

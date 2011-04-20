@@ -210,3 +210,11 @@ test("Game should return pagat points properly", function() {
   game = game_320({"pagat_played": 1, "pagat": -1, "pagat_flek": 2});
   deepEqual(game.pagat_score(), [320, -640], "Announced failed pagat with flek - jew goes to winner, loser pays");
 });
+
+module("GameView tests");
+test("GameView should parse game type and value from options", function() {
+  deepEqual(session.parseGameType("1-1"), [1, 1]);
+  deepEqual(session.parseGameType("2-3"), [2, 3]);
+  equal(session.renderGameType([1, 1]), "1-1");
+  equal(session.renderGameType([2, 3]), "2-3");
+});

@@ -19,18 +19,52 @@
         revealing: 0,
         score: 0
       };
-      PlayerSlot.prototype.licitator = function() {
-        return this.get("licitator");
+      PlayerSlot.prototype._game_score = 0;
+      PlayerSlot.prototype.licitator = function(v) {
+        if (v != null) {
+          return this.set({
+            "licitator": v
+          });
+        } else {
+          return this.get("licitator");
+        }
       };
       PlayerSlot.prototype.score = function() {
         return this.get("score");
+      };
+      PlayerSlot.prototype.game_score = function(s) {
+        if (s != null) {
+          this._game_score = s;
+          return this.change();
+        } else {
+          return this._game_score;
+        }
+      };
+      PlayerSlot.prototype.toRender = function() {
+        var x;
+        x = this.toJSON();
+        x['game_score'] = this.game_score();
+        return x;
       };
       PlayerSlot.prototype.revealing = function() {
         return this.get("revealing");
       };
       PlayerSlot.prototype.addScore = function(score) {
-        return this.set({
+        return this.save({
           "score": this.get("score") + score
+        });
+      };
+      PlayerSlot.prototype.reset = function() {
+        this.game_score(0);
+        this.licitator(false);
+        return this.set({
+          revealing: 0
+        });
+      };
+      PlayerSlot.prototype.sessionReset = function() {
+        this.reset();
+        return this.set({
+          score: 0
         });
       };
       return PlayerSlot;
@@ -92,15 +126,18 @@
       PlayerSlotView.prototype.events = {
         "click div.player-name": "edit",
         "keypress .player-name-input": "updateOnEnter",
-        "click .renonc": "renonc"
+        "click .renonc": "renonc",
+        "change .licitator": "toggleLicitator",
+        "change .hlasky": "updateHlasky"
       };
       PlayerSlotView.prototype.initialize = function() {
         this.model.bind("change", this.render);
         return this.model.view = this;
       };
       PlayerSlotView.prototype.render = function() {
-        $(this.el).html(this.template(this.model.toJSON()));
+        $(this.el).html(this.template(this.model.toRender()));
         this.setName();
+        this.setHlasky();
         return this;
       };
       PlayerSlotView.prototype.setName = function() {
@@ -110,6 +147,17 @@
         this.input = this.$('.player-name-input');
         this.input.bind('blur', this.close);
         return this.input.val(name);
+      };
+      PlayerSlotView.prototype.setHlasky = function() {
+        return this.$('.hlasky').val(this.model.get("revealing"));
+      };
+      PlayerSlotView.prototype.toggleLicitator = function() {
+        return this.model.licitator(!this.model.licitator());
+      };
+      PlayerSlotView.prototype.updateHlasky = function() {
+        return this.model.save({
+          revealing: parseInt(this.$('.hlasky').val())
+        });
       };
       PlayerSlotView.prototype.edit = function() {
         $(this.el).addClass("editing");
@@ -138,6 +186,7 @@
       __extends(Game, Backbone.Model);
       Game.prototype.localStorage = new Store("game");
       Game.prototype.defaults = {
+        game_name: 1,
         game_type: 1,
         flek: 1,
         valat: 0,
@@ -244,6 +293,20 @@
           return [0, 0];
         }
       };
+      Game.prototype.reset = function() {
+        this.save({
+          "result": 0
+        });
+        return this.slots.each(function(p) {
+          return p.reset();
+        });
+      };
+      Game.prototype.sessionReset = function() {
+        this.reset();
+        return this.slots.each(function(p) {
+          return p.sessionReset();
+        });
+      };
       return Game;
     })();
     window.GameView = (function() {
@@ -258,12 +321,21 @@
       GameView.prototype.events = {
         "click #reset": "reset",
         "click #session_reset": "sessionReset",
-        "click #process": "process"
+        "click #process": "process",
+        "change #game_result": "setResult",
+        "change #game_type": "setGameType",
+        "change #game_flek": "setGameFlek",
+        "change #valat": "setValat",
+        "change #valat_flek": "setValatFlek",
+        "change #pagat": "setPagat",
+        "change #pagat_flek": "setPagatFlek",
+        "change #pagat_uhrany": "setPagatUhrany"
       };
       GameView.prototype.initialize = function() {
         var game, slots;
         slots = new PlayerSlots();
         game = new Game();
+        game.id = "Main";
         game.slots = slots;
         this.game = game;
         slots.bind("add", this.addPlayer);
@@ -274,9 +346,18 @@
         return slots.fetch();
       };
       GameView.prototype.render = function() {
-        return this.$("#jew").html(this.jew_template({
-          'score': -this.playerScore()
+        var gt;
+        this.$("#jew").html(this.jew_template({
+          score: -this.playerScore()
         }));
+        gt = this.renderGameType([this.game.get("game_name"), this.game.get("game_type")]);
+        this.$("#game_type").val(gt);
+        this.$("#game_result").val(this.game.get("result"));
+        this.$("#valat").val(this.game.get("valat"));
+        this.$("#valat_flek").val(this.game.get("valat_flek"));
+        this.$("#pagat").val(this.game.get("pagat"));
+        this.$("#pagat_flek").val(this.game.get("pagat_flek"));
+        return this.$("#pagat_uhrany").val(this.game.get("pagat_played"));
       };
       GameView.prototype.addPlayer = function(p) {
         var view;
@@ -304,19 +385,64 @@
         return sum;
       };
       GameView.prototype.process = function() {
-        return this.game.slots.each(function(p) {
-          return p.setGameScore(10);
-        });
+        var i, result, _results;
+        result = this.game.game_score();
+        _results = [];
+        for (i = 0; i <= 3; i++) {
+          _results.push(this.game.slots.at(i).game_score(result[i]));
+        }
+        return _results;
       };
       GameView.prototype.reset = function() {
-        return this.game.slots.each(function(p) {
-          return p.reset();
-        });
+        return this.game.reset();
       };
       GameView.prototype.sessionReset = function() {
-        return this.game.slots.each(function(p) {
-          return p.sessionReset();
+        return this.game.sessionReset();
+      };
+      GameView.prototype.valToGameInt = function(fid, key) {
+        var k, s, v;
+        v = parseInt(this.$("#" + fid).val());
+        k = key != null ? key : fid;
+        s = {};
+        s[k] = v;
+        return this.game.save(s);
+      };
+      GameView.prototype.setResult = function() {
+        return this.valToGameInt("game_result", "result");
+      };
+      GameView.prototype.renderGameType = function(v) {
+        return v[0] + "-" + v[1];
+      };
+      GameView.prototype.parseGameType = function(v) {
+        return _.map(v.split("-", 2), function(x) {
+          return parseInt(x);
         });
+      };
+      GameView.prototype.setGameType = function() {
+        var g, t, _ref;
+        _ref = this.parseGameType(this.$("#game_type").val()), g = _ref[0], t = _ref[1];
+        return this.game.save({
+          game_name: g,
+          game_type: t
+        });
+      };
+      GameView.prototype.setGameFlek = function() {
+        return this.valToGameInt("game_flek", "flek");
+      };
+      GameView.prototype.setValat = function() {
+        return this.valToGameInt("valat");
+      };
+      GameView.prototype.setValatFlek = function() {
+        return this.valToGameInt("valat_flek");
+      };
+      GameView.prototype.setPagat = function() {
+        return this.valToGameInt("pagat");
+      };
+      GameView.prototype.setPagatFlek = function() {
+        return this.valToGameInt("pagat_flek");
+      };
+      GameView.prototype.setPagatUhrany = function() {
+        return this.valToGameInt("pagat_uhrany", "pagat_played");
       };
       return GameView;
     })();
