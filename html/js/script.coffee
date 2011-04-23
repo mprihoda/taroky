@@ -40,13 +40,17 @@ $ ->
     reset: ->
       @game_score(0)
       @licitator(false)
-      @set
+      @save
         revealing: 0
 
     sessionReset: ->
       @reset()
-      @set
+      @save
         score: 0
+
+    commit: ->
+      @addScore(@game_score())
+      @game_score(0)
 
   class window.PlayerSlots extends Backbone.Collection
 
@@ -235,12 +239,21 @@ $ ->
         [0, 0]
 
     reset: ->
-      @save({"result": 0})
+      @save(@defaults)
       @slots.each (p) -> p.reset()
 
     sessionReset: ->
       @reset()
       @slots.each (p) -> p.sessionReset()
+
+    process: ->
+      result = @game_score()
+      for i in [0..3]
+        @slots.at(i).game_score(result[i])
+
+    commit: ->
+      @slots.each((s) -> s.commit())
+      @reset()
 
     # TODO: bind game props to form elements
 
@@ -251,6 +264,7 @@ $ ->
       "click #reset": "reset"
       "click #session_reset": "sessionReset"
       "click #process": "process"
+      "click #commit": "commit"
       "change #game_result": "setResult"
       "change #game_type": "setGameType"
       "change #game_flek": "setGameFlek"
@@ -306,9 +320,10 @@ $ ->
       sum
 
     process: ->
-      result = @game.game_score()
-      for i in [0..3]
-        @game.slots.at(i).game_score(result[i])
+      @game.process()
+
+    commit: ->
+      @game.commit()
 
     reset: ->
       @game.reset()
