@@ -12,7 +12,7 @@ $ ->
 
     licitator: (v) ->
       if v?
-        @set({"licitator": v})
+        @save({"licitator": v})
       else
         @get("licitator")
 
@@ -25,11 +25,6 @@ $ ->
         @change()
       else
         @_game_score
-
-    toRender: ->
-      x = @toJSON()
-      x['game_score'] = @game_score()
-      x
 
     revealing: ->
       @get("revealing")
@@ -87,23 +82,26 @@ $ ->
 
   class window.PlayerSlotView extends Backbone.View
 
-    tagName: "li"
-    template: _.template($("#player-template").html())
     events:
-      "click div.player-name": "edit"
+      "click .player-name": "edit"
       "keypress .player-name-input": "updateOnEnter"
       "click .renonc": "renonc"
       "change .licitator": "toggleLicitator"
       "change .hlasky": "updateHlasky"
 
-    initialize: ->
-      @model.bind("change", @render)
+    initialize: (options) ->
+      order = if options.order? then options.order else 1
+      @el = $("#player#{ order }")
+      @delegateEvents()
+      @model.bind("all", @render)
       @model.view = @
 
     render: =>
-      $(@el).html(@template(@model.toRender()))
       @setName()
       @setHlasky()
+      @setLicitator()
+      @setScore()
+      @setGameScore()
       @
 
     setName: ->
@@ -115,6 +113,18 @@ $ ->
 
     setHlasky: ->
       @$('.hlasky').val @model.get("revealing")
+
+    setLicitator: ->
+      if @model.licitator()
+        @$('.licitator').attr('checked', 'checked')
+      else
+        @$('.licitator').removeAttr('checked')
+
+    setScore: ->
+      @$('.player-score').text(@model.get("score"))
+
+    setGameScore: ->
+      @$('.game-score').val(@model.game_score())
 
     toggleLicitator: ->
       @model.licitator(!@model.licitator())
@@ -258,8 +268,7 @@ $ ->
     # TODO: bind game props to form elements
 
   class window.GameView extends Backbone.View
-    el: $("#main")
-    jew_template: _.template $("#jew-template").html()
+    el: $("#container")
     events:
       "click #reset": "reset"
       "click #session_reset": "sessionReset"
@@ -290,9 +299,7 @@ $ ->
       slots.fetch()
 
     render: =>
-      @$("#jew").html(@jew_template
-        score: -@playerScore()
-      )
+      @$("#jew .player-score").text(-@playerScore())
       gt = @renderGameType([@game.get("game_name"), @game.get("game_type")])
       @$("#game_type").val(gt)
       @$("#game_result").val(@game.get("result"))
@@ -302,13 +309,15 @@ $ ->
       @$("#pagat_flek").val(@game.get("pagat_flek"))
       @$("#pagat_uhrany").val(@game.get("pagat_played"))
 
-    addPlayer: (p) =>
+    addPlayer: (p, o) =>
       view = new PlayerSlotView
         model: p
-      @$("#player-list").append(view.render().el)
+        order: o
+      view.render()
 
     addAllPlayers: (s) =>
-      s.each(@addPlayer)
+      for i in [1..4]
+        @addPlayer(s.at(i-1), i)
 
     playerScore: ->
       s = @game.slots

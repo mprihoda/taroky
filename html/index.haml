@@ -14,8 +14,7 @@
     Always force latest IE rendering engine (even in intranet) & Chrome Frame
     Remove this if you use .htaccess
   %meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
-  %title
-    Score Card for Taroky
+  %title Score Card for Taroky
   %meta(name="description" content="Score Card for Taroky")
   %meta(name="author" content="Michal Příhoda")
 
@@ -40,132 +39,132 @@
 %body
   #container
     %header
-      %h1
-        Počítadlo Taroků
+      %h1 Počítadlo Taroků
+      #actions
+        %input#reset(type="reset" value="Reset")
+        %input#session_reset(type="reset" value="New")
     %section#main
-      #game
-        %ul#game-state
-          %li
-            %h2
-              Hra
-            %select#game_type
-              %option(value="0-1")
-                Varšava
-              %option(value="1-1")
-                První
-              %option(value="2-2")
-                Druhá
-              %option(value="3-1")
-                Preferans prvá
-              %option(value="3-2")
-                Preferans druhá
-              %option(value="3-3")
-                Preferans třetí
-              %option(value="4-4")
-                Sólo
-            %select#game_flek.flek
-              %option(value="1")
-                1x
-              %option(value="2")
-                2x
-              %option(value="4")
-                4x
-              %option(value="8")
-                8x
-              %option(value="16")
-                16x
-          %li
-            %h2
-              Valát
-            %select#valat.zavazujici
-              %option(value="1")
-                Pro
-              %option(value="0")
-                Bez
-              %option(value="-1")
-                Proti
-            %select#valat_flek
-              %option(value="1")
-                1x
-              %option(value="2")
-                2x
-              %option(value="4")
-                4x
-              %option(value="8")
-                8x
-              %option(value="16")
-                16x
-          %li
-            %h2
-              Pagát
-            %select#pagat.zavazujici
-              %option(value="1")
-                Pro
-              %option(value="0")
-                Bez
-              %option(value="-1")
-                Proti
-            %select#pagat_flek
-              %option(value="1")
-                1x
-              %option(value="2")
-                2x
-              %option(value="4")
-                4x
-              %option(value="8")
-                8x
-              %option(value="16")
-                16x
-            %select#pagat_uhrany
-              %option(value="1")
-                Pro
-              %option(value="0")
-                Ne
-              %option(value="-1")
-                Proti
-          %li
-            %h2
-              Skóre ze hry
-            %input#game_result(type="text" value="0")
-            %input#process(type="button" value="Spočítej")
-          %li
-            %h2
-              Akce
-            %input#reset(type="reset" value="Reset")
-            %input#session_reset(type="reset" value="New")
+      #game-state
+        #game
+          %h2 Hra
+          %select#game_type
+            %option(value="0-1") Varšava
+            %option(value="1-1") První
+            %option(value="2-2") Druhá
+            %option(value="3-1") Preferans prvá
+            %option(value="3-2") Preferans druhá
+            %option(value="3-3") Preferans třetí
+            %option(value="4-4") Sólo
+          %select#game_flek.flek
+            %option(value="1") 1x
+            %option(value="2") 2x
+            %option(value="4") 4x
+            %option(value="8") 8x
+            %option(value="16") 16x
+        #valat
+          %h2 Valát
+          %select#valat.zavazujici
+            %option(value="1") Pro
+            %option(value="0") Bez
+            %option(value="-1") Proti
+          %select#valat_flek
+            %option(value="1") 1x
+            %option(value="2") 2x
+            %option(value="4") 4x
+            %option(value="8") 8x
+            %option(value="16") 16x
+        #pagat
+          %h2 Pagát
+          %select#pagat.zavazujici
+            %option(value="1") Pro
+            %option(value="0") Bez
+            %option(value="-1") Proti
+          %select#pagat_flek
+            %option(value="1") 1x
+            %option(value="2") 2x
+            %option(value="4") 4x
+            %option(value="8") 8x
+            %option(value="16") 16x
+          %select#pagat_uhrany
+            %option(value="1") Pro
+            %option(value="0") Ne
+            %option(value="-1") Proti
       #players
-        %ul#player-list
-          %li#jew
+        #player-list
+          #jew
+            %input.licitator(type="checkbox" disabled="disabled")
+            .player-name
+              .display Žid
+            %select.hlasky(disabled="disabled")
+              %option(value="0") 0
+              %option(value="20") 20
+            %input#game_result.game-score(type="number" size="3")
+            %span.player-score 0
+            #actions
+              %input#process(type="button" value="Spočítej")
+              %input#commit(type="button" value="Přičti")
+          #player1
+            %input.licitator(type="checkbox")
+            .player-name
+              .display
+              .edit
+                %input.player-name-input(type="text" value="")
+            %select.hlasky
+              %option(value="0") 0
+              %option(value="5") 5
+              %option(value="10") 10
+              %option(value="15") 15
+              %option(value="20") 20
+            %input.game-score(type="number" size="3")
+            %span.player-score 0
+            %input.renonc(type="button" value="R")
+          #player2
+            %input.licitator(type="checkbox")
+            .player-name
+              .display
+              .edit
+                %input.player-name-input(type="text" value="")
+            %select.hlasky
+              %option(value="0") 0
+              %option(value="5") 5
+              %option(value="10") 10
+              %option(value="15") 15
+              %option(value="20") 20
+            %input.game-score(type="number" size="3")
+            %span.player-score 0
+            %input.renonc(type="button" value="R")
+          #player3
+            %input.licitator(type="checkbox")
+            .player-name
+              .display
+              .edit
+                %input.player-name-input(type="text" value="")
+            %select.hlasky
+              %option(value="0") 0
+              %option(value="5") 5
+              %option(value="10") 10
+              %option(value="15") 15
+              %option(value="20") 20
+            %input.game-score(type="number" size="3")
+            %span.player-score 0
+            %input.renonc(type="button" value="R")
+          #player4
+            %input.licitator(type="checkbox")
+            .player-name
+              .display
+              .edit
+                %input.player-name-input(type="text" value="")
+            %select.hlasky
+              %option(value="0") 0
+              %option(value="5") 5
+              %option(value="10") 10
+              %option(value="15") 15
+              %option(value="20") 20
+            %input.game-score(type="number" size="3")
+            %span.player-score 0
+            %input.renonc(type="button" value="R")
     %footer
       &copy; 2011 Michal Příhoda
-  %script#player-template(type="text/template")
-    %input.renonc(type="button" value="R")
-    %select.hlasky
-      %option(value="0")
-        0
-      %option(value="5")
-        5
-      %option(value="10")
-        10
-      %option(value="15")
-        15
-      %option(value="20")
-        20
-    %span.game-score
-      <%= game_score %>
-    %span.player-score
-      <%= score %>
-    <input class="licitator" type="checkbox" <%= licitator ? 'checked="checked"' : '' %> />
-    .player-name
-      .display
-      .edit
-        %input.player-name-input(type="text" value="")
-    .score-details
-  %script#jew-template(type="text/template")
-    %span.player-score
-      <%= score %>
-    %span.player-name
-      Jew
   / JavaScript at the bottom for fast page loading
 
   / Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary

@@ -223,12 +223,38 @@ a:hover
  *
  * Author: mprihoda
  */
+color10 = #0B61A4
+color11 = #25567B
+color12 = #033E6B
+color13 = #3F92D2
+color14 = #66A3D2
+color20 = #FF9200
+color21 = #BF8230
+color22 = #A65F00
+color23 = #FFAD40
+color24 = #FFC373
+
+#container
+  display table
+  & header, section, footer
+    display table-row
+    & > div
+      display table-cell
 
 #player-list
+  display table
+  border-collapse collapse
+  & > div
+    display table-row
+    & *
+      display table-cell
+  & .player-name
+    display table-cell
   & .editing .display, & .edit
+    float: right
     display none
   & .editing .edit
-    display block
+    display table-cell
 
 /**
  * Non-semantic helper classes: please define your styles before this section.
