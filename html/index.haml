@@ -121,7 +121,7 @@
             .field
               %input.game-score(type="number" size="5")
             .player-score 0
-            .field
+            .actions
               %input.renonc(type="button" value="R")
           %li#player2
             %input.licitator(type="checkbox")
@@ -139,7 +139,7 @@
             .field
               %input.game-score(type="number" size="5")
             .player-score 0
-            .field
+            .actions
               %input.renonc(type="button" value="R")
           %li#player3
             %input.licitator(type="checkbox")
@@ -157,7 +157,7 @@
             .field
               %input.game-score(type="number" size="5")
             .player-score 0
-            .field
+            .actions
               %input.renonc(type="button" value="R")
           %li#player4
             %input.licitator(type="checkbox")
@@ -175,10 +175,16 @@
             .field
               %input.game-score(type="number" size="5")
             .player-score 0
-            .field
+            .actions
               %input.renonc(type="button" value="R")
-    %footer
-      &copy; 2011 Michal Příhoda
+    %section#history
+      %table
+        %tr.names
+          %th#p1 Player 1
+          %th#p2 Player 2
+          %th#p3 Player 3
+          %th#p4 Player 4
+          %th#j Žid
   / JavaScript at the bottom for fast page loading
 
   / Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary

@@ -236,14 +236,68 @@ color22 = #A65F00
 color23 = #FFAD40
 color24 = #FFC373
 
+defpad = 1em 1em 1em 1em
+halfpad = 0.5em 0.5em 0.5em 0.5em
+
 header
   background-color color10
   color white
+  height 4em
   & > *
-    padding 10px 10px 10px 10px
+    padding defpad
+  & h1
+    font-size 1.2em
+    float left
 
-#main > *
-  padding 5px 5px 5px 5px
+#container
+  width 900px
+  margin-left auto
+  margin-right auto
+
+#main
+  width 100%
+  & > *
+    padding halfpad
+
+footer
+  text-align center
+
+#game-state
+  margin-left 0
+  width 20%
+  height 14em
+  background-color color24
+  color color10
+  float left
+  padding defpad
+  & > *
+    padding halfpad
+
+#players
+  background-color color14
+  padding defpad
+
+#player-list
+  width 70%
+  height 14em
+  display table
+  margin auto
+  border-collapse collapse
+  & > li
+    display table-row
+    & *
+      display table-cell
+  & .player-name
+    display table-cell
+  & .editing .display, & .edit
+    float: right
+    display none
+  & .editing .edit
+    display table-cell
+
+.player-score
+  text-align right
+  font-weight bold
 
 .actions
   text-align right
@@ -264,41 +318,12 @@ header
   background-color color14
   color white
 
-#game-state
-  background-color color24
-  color color10
-
-#container
-  display table
-  & > *
-    padding 10px 10px 10px 10px
-  & header, section, footer
-    display table-row
-    & > div
-      display table-cell
-
-#players
-  background-color color14
-
-#player-list
-  display table
-  border-collapse collapse
-  & > li
-    display table-row
-    & *
-      display table-cell
-      padding 5px 5px 5px 5px
-  & .player-name
-    display table-cell
-  & .editing .display, & .edit
-    float: right
-    display none
-  & .editing .edit
-    display table-cell
-
-.player-score
-  text-align right
-  font-weight bold
+.history table
+  width 100%
+  margin-top 1em
+  & td
+    text-align right
+    padding-right 2em
 
 /**
  * Non-semantic helper classes: please define your styles before this section.

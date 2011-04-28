@@ -80,6 +80,10 @@ $ ->
         )
         super(@defaultSlots(), options)
 
+    commit: ->
+      @.each((s) -> s.commit())
+      @trigger("commit")
+
   class window.PlayerSlotView extends Backbone.View
 
     events:
@@ -91,7 +95,7 @@ $ ->
       "change .game-score": "updateGameScore"
 
     initialize: (options) ->
-      order = if options.order? then options.order else 1
+      order = if options? and options.order? then options.order else 1
       @el = $("#player#{ order }")
       @delegateEvents()
       @model.bind("all", @render)
@@ -151,6 +155,8 @@ $ ->
 
     renonc: (e) ->
       @model.addScore -20
+      # FIXME: breaks Law of Demeter
+      @model.collection.trigger("commit")
 
   class window.Game extends Backbone.Model
 
@@ -266,10 +272,100 @@ $ ->
         @slots.at(i).game_score(result[i])
 
     commit: ->
-      @slots.each((s) -> s.commit())
+      @slots.commit()
       @reset()
 
-    # TODO: bind game props to form elements
+  class window.HistoryLine extends Backbone.Model
+
+    defaults:
+      p1: 0
+      p2: 0
+      p3: 0
+      p4: 0
+      jew: 0
+
+  class window.History extends Backbone.Collection
+
+    model: HistoryLine
+    localStorage: new Store("history")
+
+    defaultLine: ->
+      @fromArray([-10, -10, -10, -10, 40])
+
+    fromArray: (a) ->
+      new HistoryLine
+        p1: a[0]
+        p2: a[1]
+        p3: a[2]
+        p4: a[3]
+        jew: a[4]
+
+    toArray: (h) ->
+      [h.get("p1"), h.get("p2"), h.get("p3"), h.get("p4"), h.get("jew")]
+
+    arrayAt: (i) ->
+      @toArray(@at(i))
+
+    refresh: (models, options) ->
+      if models? and (models.length > 0)
+        super(models, options)
+      else
+        l = @defaultLine()
+        r = super(l, options)
+        l.save()
+        r
+
+    clear: ->
+      _.each(@models.slice(), (m) -> m.destroy())
+      @refresh()
+
+  class window.HistoryView extends Backbone.View
+
+    el: $(".history")
+
+    initialize: (options) ->
+      if options? and options.game?
+        @game = options.game
+        @game.slots.bind("refresh", @renderNames)
+        @game.slots.bind("refresh", @bindslots)
+        @game.slots.bind("commit", @commit)
+      @table = @$("table")
+      @model = new History
+      @model.bind("refresh", @render)
+      @model.bind("add", @addRow)
+
+      @model.fetch()
+
+    renderNames: =>
+      for i in [1..4]
+        @$("#p#{ i }").text(@game.slots.at(i - 1).get("name"))
+
+    render: =>
+      $("tr.data", @table).remove()
+      @model.each((r) => @addRow(r))
+
+    addRow: (r) =>
+      @getRow(@model.toArray(r)).appendTo(@table)
+
+    getRow: (values) ->
+      cells = _.reduce(_.map(values, (s) -> "<td>#{s}</td>"), ((m, t) -> m + t), "")
+      $("<tr class='data'>#{cells}</tr>")
+
+    bindslots: =>
+      @game.slots.each (s) ->
+        s.bind("change:name", @renderName)
+
+    commit: =>
+      values = []
+      for i in [0..3]
+        values[i] = @game.slots.at(i).get("score")
+      values[4] = @game.jew_score()
+      l = @model.fromArray(values)
+      @model.add(l)
+      l.save()
+
+    sessionReset: ->
+      @model.clear()
 
   class window.GameView extends Backbone.View
     el: $("#container")
@@ -293,6 +389,8 @@ $ ->
       game.id = "Main"
       game.slots = slots
       @game = game
+      @hist = new HistoryView
+        game: game
 
       slots.bind("add", @addPlayer)
       slots.bind("refresh", @addAllPlayers)
@@ -342,6 +440,7 @@ $ ->
       @game.reset()
 
     sessionReset: ->
+      @hist.sessionReset()
       @game.sessionReset()
 
     valToGameInt: (fid, key) ->

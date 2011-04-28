@@ -218,3 +218,10 @@ test("GameView should parse game type and value from options", function() {
   equal(session.renderGameType([1, 1]), "1-1");
   equal(session.renderGameType([2, 3]), "2-3");
 });
+
+module("History tests");
+test("History should init with default line", function() {
+  expect(1);
+  var hist = new History();
+  deepEqual(hist.toArray(hist.defaultLine()), [-10, -10, -10, -10, 40], "First history line should always be 4 times -10 and 40 in jew");
+});
