@@ -208,6 +208,8 @@ body, select, input, textarea
   color #444
   /* Set your base font here, to apply evenly */
   /* font-family: Georgia, serif;  */
+  font-family 'helvetica neue', helvetica, arial, sans-serif
+  font-size 16px
 
 /* Headers (h1, h2, etc) have no default font-size or margin; define those yourself */
 h1, h2, h3, h4, h5, h6
@@ -223,12 +225,80 @@ a:hover
  *
  * Author: mprihoda
  */
+color10 = #0B61A4
+color11 = #25567B
+color12 = #033E6B
+color13 = #3F92D2
+color14 = #66A3D2
+color20 = #FF9200
+color21 = #BF8230
+color22 = #A65F00
+color23 = #FFAD40
+color24 = #FFC373
+
+header
+  background-color color10
+  color white
+  & > *
+    padding 10px 10px 10px 10px
+
+#main > *
+  padding 5px 5px 5px 5px
+
+.actions
+  text-align right
+
+.renonc
+  background-color red
+  color white
+
+#commit
+  background-color green
+  color white
+
+#process
+  background-color color20
+  color white
+
+#reset, #session_reset
+  background-color color14
+  color white
+
+#game-state
+  background-color color24
+  color color10
+
+#container
+  display table
+  & > *
+    padding 10px 10px 10px 10px
+  & header, section, footer
+    display table-row
+    & > div
+      display table-cell
+
+#players
+  background-color color14
 
 #player-list
+  display table
+  border-collapse collapse
+  & > li
+    display table-row
+    & *
+      display table-cell
+      padding 5px 5px 5px 5px
+  & .player-name
+    display table-cell
   & .editing .display, & .edit
+    float: right
     display none
   & .editing .edit
-    display block
+    display table-cell
+
+.player-score
+  text-align right
+  font-weight bold
 
 /**
  * Non-semantic helper classes: please define your styles before this section.
