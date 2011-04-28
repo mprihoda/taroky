@@ -40,7 +40,7 @@
   #container
     %header
       %h1 Počítadlo Taroků
-      #actions
+      .actions
         %input#reset(type="reset" value="Reset")
         %input#session_reset(type="reset" value="New")
     %section#main
@@ -90,79 +90,93 @@
             %option(value="0") Ne
             %option(value="-1") Proti
       #players
-        #player-list
-          #jew
+        %ul#player-list
+          %li#jew
             %input.licitator(type="checkbox" disabled="disabled")
             .player-name
               .display Žid
-            %select.hlasky(disabled="disabled")
-              %option(value="0") 0
-              %option(value="20") 20
-            %input#game_result.game-score(type="number" size="3")
+            .field
+              %select.hlasky(disabled="disabled")
+                %option(value="0") 0
+                %option(value="20") 20
+            .field
+              %input#game_result(type="number" size="5")
             %span.player-score 0
-            #actions
+            .actions
               %input#process(type="button" value="Spočítej")
               %input#commit(type="button" value="Přičti")
-          #player1
+          %li#player1
             %input.licitator(type="checkbox")
             .player-name
               .display
               .edit
                 %input.player-name-input(type="text" value="")
-            %select.hlasky
-              %option(value="0") 0
-              %option(value="5") 5
-              %option(value="10") 10
-              %option(value="15") 15
-              %option(value="20") 20
-            %input.game-score(type="number" size="3")
-            %span.player-score 0
-            %input.renonc(type="button" value="R")
-          #player2
+            .field
+              %select.hlasky
+                %option(value="0") 0
+                %option(value="5") 5
+                %option(value="10") 10
+                %option(value="15") 15
+                %option(value="20") 20
+            .field
+              %input.game-score(type="number" size="5")
+            .player-score 0
+            .field
+              %input.renonc(type="button" value="R")
+          %li#player2
             %input.licitator(type="checkbox")
             .player-name
               .display
               .edit
                 %input.player-name-input(type="text" value="")
-            %select.hlasky
-              %option(value="0") 0
-              %option(value="5") 5
-              %option(value="10") 10
-              %option(value="15") 15
-              %option(value="20") 20
-            %input.game-score(type="number" size="3")
-            %span.player-score 0
-            %input.renonc(type="button" value="R")
-          #player3
+            .field
+              %select.hlasky
+                %option(value="0") 0
+                %option(value="5") 5
+                %option(value="10") 10
+                %option(value="15") 15
+                %option(value="20") 20
+            .field
+              %input.game-score(type="number" size="5")
+            .player-score 0
+            .field
+              %input.renonc(type="button" value="R")
+          %li#player3
             %input.licitator(type="checkbox")
             .player-name
               .display
               .edit
                 %input.player-name-input(type="text" value="")
-            %select.hlasky
-              %option(value="0") 0
-              %option(value="5") 5
-              %option(value="10") 10
-              %option(value="15") 15
-              %option(value="20") 20
-            %input.game-score(type="number" size="3")
-            %span.player-score 0
-            %input.renonc(type="button" value="R")
-          #player4
+            .field
+              %select.hlasky
+                %option(value="0") 0
+                %option(value="5") 5
+                %option(value="10") 10
+                %option(value="15") 15
+                %option(value="20") 20
+            .field
+              %input.game-score(type="number" size="5")
+            .player-score 0
+            .field
+              %input.renonc(type="button" value="R")
+          %li#player4
             %input.licitator(type="checkbox")
             .player-name
               .display
               .edit
                 %input.player-name-input(type="text" value="")
-            %select.hlasky
-              %option(value="0") 0
-              %option(value="5") 5
-              %option(value="10") 10
-              %option(value="15") 15
-              %option(value="20") 20
-            %input.game-score(type="number" size="3")
-            %span.player-score 0
-            %input.renonc(type="button" value="R")
+            .field
+              %select.hlasky
+                %option(value="0") 0
+                %option(value="5") 5
+                %option(value="10") 10
+                %option(value="15") 15
+                %option(value="20") 20
+            .field
+              %input.game-score(type="number" size="5")
+            .player-score 0
+            .field
+              %input.renonc(type="button" value="R")
     %footer
       &copy; 2011 Michal Příhoda
   / JavaScript at the bottom for fast page loading

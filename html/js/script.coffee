@@ -88,6 +88,7 @@ $ ->
       "click .renonc": "renonc"
       "change .licitator": "toggleLicitator"
       "change .hlasky": "updateHlasky"
+      "change .game-score": "updateGameScore"
 
     initialize: (options) ->
       order = if options.order? then options.order else 1
@@ -132,6 +133,9 @@ $ ->
     updateHlasky: ->
       @model.save
         revealing: parseInt(@$('.hlasky').val())
+
+    updateGameScore: ->
+      @model.game_score(parseInt(@$('.game-score').val()))
 
     edit: ->
       $(@el).addClass "editing"
