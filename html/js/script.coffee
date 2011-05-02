@@ -428,6 +428,7 @@ $ ->
       gn = @game.get("game_name")
       gt = @renderGameType([gn, @game.get("game_type")])
       @$("#game_type").val(gt)
+      @$("#game_flek").val(@game.get("flek"))
       if gn == 0
         @$("#game_result").val(70 - @game.total_game_score())
       else
