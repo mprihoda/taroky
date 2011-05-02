@@ -221,6 +221,36 @@ test("When game type is 'Druha', pagat must be set", function() {
   equal(game.pagat(), 0, "When 'treti' takes over, the pagat is re-set to none.");
 });
 
+test("Game should count Varsava correctly", function() {
+  expect(6);
+
+  var game_v = function(scores) {
+    var g = new Game({"game_name": 0, "game_type": 1});
+    var slots = new PlayerSlots();
+    slots.refresh();
+    for (i = 0; i < 4; i++) {
+      slots.at(i).game_score(scores[i]);
+    }
+    g.slots = slots;
+    return g;
+  };
+
+  var game = game_v([10, 10, 25, 25]);
+  equal(game.valid(), true, "Game should be valid when sum of scores is 70");
+  deepEqual(game.game_score(), [-10, -10, -25, -25], "Game score should match the input");
+
+  game = game_v([10, 10, 20, 2]);
+  equal(game.valid(), false, "Game should be invalid when sum of scores is not 70");
+
+  game = game_v([10, 10, 50, 0]);
+  deepEqual(game.game_score(), [-20, -20, -100, 0], "Game score should match the input 2 times");
+  game = game_v([10, 60, 0, 0]);
+  deepEqual(game.game_score(), [-40, -240, 0, 0], "Game score should match the input 4 times");
+  game = game_v([70, 0, 0, 0]);
+  deepEqual(game.game_score(), [-560, 0, 0, 0], "Game score should match the input 8 times");
+
+});
+
 module("GameView tests");
 test("GameView should parse game type and value from options", function() {
   deepEqual(session.parseGameType("1-1"), [1, 1]);

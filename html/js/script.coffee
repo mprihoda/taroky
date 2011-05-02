@@ -181,7 +181,7 @@ $ ->
       lc = @licitator_count()
       gn = @get("game_name")
       switch gn
-        when 0 then true
+        when 0 then @total_game_score() == 70
         when 1, 2 then lc == 1 or lc == 2
         else lc == 1
 
@@ -190,6 +190,10 @@ $ ->
 
     total_score: ->
       sum_score = (memo, s) -> memo + s.score()
+      @slots.reduce sum_score, 0
+
+    total_game_score: ->
+      sum_score = (memo, s) -> memo + s.game_score()
       @slots.reduce sum_score, 0
 
     licitator_count: ->
@@ -215,7 +219,13 @@ $ ->
         r
 
     game_score: ->
-      @aux_game_score(@team_revealing_score())
+      if @get("game_name") > 0
+        @aux_game_score(@team_revealing_score())
+      else
+        count = (memo, s) -> if s.game_score() == 0 then memo + 1 else memo
+        zeros = @slots.reduce count, 0
+        @slots.map (s) ->
+          (1 << zeros) * - s.game_score()
 
     aux_game_score: (rev_score) ->
       sc = @base_score()
@@ -415,9 +425,13 @@ $ ->
 
     render: =>
       @$("#jew .player-score").text(-@playerScore())
-      gt = @renderGameType([@game.get("game_name"), @game.get("game_type")])
+      gn = @game.get("game_name")
+      gt = @renderGameType([gn, @game.get("game_type")])
       @$("#game_type").val(gt)
-      @$("#game_result").val(@game.get("result"))
+      if gn == 0
+        @$("#game_result").val(70 - @game.total_game_score())
+      else
+        @$("#game_result").val(@game.get("result"))
       @$("#valat").val(@game.get("valat"))
       @$("#valat_flek").val(@game.get("valat_flek"))
       @$("#pagat").val(@game.pagat())
@@ -426,13 +440,11 @@ $ ->
       @validate()
 
     validate: ->
-      if @game.get("game_name") == 2
-        @$("#pagat").attr("disabled", "disabled")
-      else
-        @$("#pagat").removeAttr("disabled")
-      @disableOn(@game.get("game_name") == 2, "#pagat")
-      @disableOn(@game.get("game_name") != 0, ".game-score")
-      @disableOn(@game.get("game_name") == 0, "#game_result")
+      gn = @game.get("game_name")
+      @disableOn(gn == 2, "#pagat")
+      @disableOn(gn != 0, ".game-score")
+      @disableOn(gn == 0, "#game_result")
+      @disableOn(gn == 0, ".hlasky")
       @disableOn(not @game.valid(), "#process")
 
     disableOn: (b, selector) ->
