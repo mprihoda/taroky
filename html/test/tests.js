@@ -211,6 +211,16 @@ test("Game should return pagat points properly", function() {
   deepEqual(game.pagat_score(), [320, -640], "Announced failed pagat with flek - jew goes to winner, loser pays");
 });
 
+test("When game type is 'Druha', pagat must be set", function() {
+  expect(3);
+  var game = new Game();
+  equal(game.pagat(), 0, "Default pagat announcement is set to none.");
+  game.set({"game_name": 2, "game_type": 2});
+  equal(game.pagat(), 1, "With 'druhá' pagat is set to the licitator side.");
+  game.set({"game_name": 3, "game_type": 1});
+  equal(game.pagat(), 0, "When 'treti' takes over, the pagat is re-set to none.");
+});
+
 module("GameView tests");
 test("GameView should parse game type and value from options", function() {
   deepEqual(session.parseGameType("1-1"), [1, 1]);
