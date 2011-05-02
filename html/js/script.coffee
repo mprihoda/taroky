@@ -177,6 +177,14 @@ $ ->
       pagat_played: 0
       result: 0
 
+    valid: ->
+      lc = @licitator_count()
+      gn = @get("game_name")
+      switch gn
+        when 0 then true
+        when 1, 2 then lc == 1 or lc == 2
+        else lc == 1
+
     jew_score: ->
       -@total_score()
 
@@ -413,21 +421,28 @@ $ ->
       @$("#valat").val(@game.get("valat"))
       @$("#valat_flek").val(@game.get("valat_flek"))
       @$("#pagat").val(@game.pagat())
+      @$("#pagat_flek").val(@game.get("pagat_flek"))
+      @$("#pagat_uhrany").val(@game.get("pagat_played"))
+      @validate()
+
+    validate: ->
       if @game.get("game_name") == 2
         @$("#pagat").attr("disabled", "disabled")
       else
         @$("#pagat").removeAttr("disabled")
-      @$("#pagat_flek").val(@game.get("pagat_flek"))
-      @$("#pagat_uhrany").val(@game.get("pagat_played"))
       @disableOn(@game.get("game_name") == 2, "#pagat")
       @disableOn(@game.get("game_name") != 0, ".game-score")
       @disableOn(@game.get("game_name") == 0, "#game_result")
+      @disableOn(not @game.valid(), "#process")
 
     disableOn: (b, selector) ->
+      e = @$(selector)
       if b
-        @$(selector).attr("disabled", "disabled")
+        e.attr("disabled", "disabled")
+        e.addClass("disabled")
       else
-        @$(selector).removeAttr("disabled")
+        e.removeAttr("disabled")
+        e.removeClass("disabled")
 
     addPlayer: (p, o) =>
       view = new PlayerSlotView
