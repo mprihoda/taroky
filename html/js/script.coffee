@@ -235,11 +235,16 @@ $ ->
           memo
         ), [0, 0]
 
+    pagat: ->
+      if @get("game_name") == 2
+        1
+      else
+        @get("pagat")
 
     pagat_score: ->
       jew = @jew_score()
       pp = @get("pagat_played")
-      p = @get("pagat")
+      p = @pagat()
       pf = @get("pagat_flek")
       inverse = (inv, score) ->
         if inv == 1 then score else [score[1], score[0]]
@@ -407,9 +412,22 @@ $ ->
       @$("#game_result").val(@game.get("result"))
       @$("#valat").val(@game.get("valat"))
       @$("#valat_flek").val(@game.get("valat_flek"))
-      @$("#pagat").val(@game.get("pagat"))
+      @$("#pagat").val(@game.pagat())
+      if @game.get("game_name") == 2
+        @$("#pagat").attr("disabled", "disabled")
+      else
+        @$("#pagat").removeAttr("disabled")
       @$("#pagat_flek").val(@game.get("pagat_flek"))
       @$("#pagat_uhrany").val(@game.get("pagat_played"))
+      @disableOn(@game.get("game_name") == 2, "#pagat")
+      @disableOn(@game.get("game_name") != 0, ".game-score")
+      @disableOn(@game.get("game_name") == 0, "#game_result")
+
+    disableOn: (b, selector) ->
+      if b
+        @$(selector).attr("disabled", "disabled")
+      else
+        @$(selector).removeAttr("disabled")
 
     addPlayer: (p, o) =>
       view = new PlayerSlotView
