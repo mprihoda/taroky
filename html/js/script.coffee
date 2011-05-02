@@ -419,6 +419,15 @@ $ ->
         @$("#pagat").removeAttr("disabled")
       @$("#pagat_flek").val(@game.get("pagat_flek"))
       @$("#pagat_uhrany").val(@game.get("pagat_played"))
+      @disableOn(@game.get("game_name") == 2, "#pagat")
+      @disableOn(@game.get("game_name") != 0, ".game-score")
+      @disableOn(@game.get("game_name") == 0, "#game_result")
+
+    disableOn: (b, selector) ->
+      if b
+        @$(selector).attr("disabled", "disabled")
+      else
+        @$(selector).removeAttr("disabled")
 
     addPlayer: (p, o) =>
       view = new PlayerSlotView
