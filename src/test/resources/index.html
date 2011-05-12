@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>QUnit Tests</title>
+    <link rel="stylesheet" href="qunit/qunit.css" media="screen">
+
+    <!-- reference your own javascript files here -->
+
+    <script src="../js/libs/modernizr-1.7.min.js"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/mylibs/underscore.js"></script>
+    <script src="../js/mylibs/backbone.js"></script>
+    <script src="../js/mylibs/backbone-localstorage.js"></script>
+    <script src="../js/script.js"></script>
+
+
+    <!-- test runner files -->
+    <script src="qunit/qunit.js"></script>
+    <script src="tests.js"></script>
+
+
+</head>
+<body class="flora">
+<h1 id="qunit-header">QUnit Test Suite</h1>
+
+<h2 id="qunit-banner"></h2>
+
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+<div id="qunit-fixture">test markup</div>
+</body>
+
+<!-- Templates -->
+<script type="text/template" id="player-template">
+    <div class="player">
+        <div class="display">
+            <div class="player-name"></div>
+        </div>
+        <div class="edit">
+            <input class="player-name-input" type="text" value=""/>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="jew-template">
+    <div class="checkbox"><input type="checkbox" class="licitator" disabled/></div>
+    <div class="player-name">Jew</div>
+    <div class="player-score"><%= score %></div>
+    <div class="game-score"><input class="player-game-score" size="4" type="text" value="0"/></div>
+</script>
+
+</html>
