@@ -1,7 +1,9 @@
 fs = require 'fs'
-{exec} = require 'child_process'
+util = require 'util'
+{exec, spawn} = require 'child_process'
 
 out = 'target'
+ngout = "#{out}/nginx"
 dest = "#{out}/htdocs"
 src = 'src'
 main_src = "#{src}/main"
@@ -55,3 +57,17 @@ task 'resources', 'copy the resources to target dir', (options) ->
 task 'clean', 'clean the output directory', (options) ->
   exec "rm -rf #{dest}", (err) ->
     throw err if err
+
+task 'nginx:start', 'run nginx', (options) ->
+  exec "mkdir -p #{ngout}", (err, stdout, stderr) ->
+    throw err if err
+    files = (file for file in fs.readdirSync "#{src}/nginx")
+    for file in files
+      sed = "sed -e 's,\\$pwd\\$,#{process.cwd()},g'"
+      cmd = "cat #{src}/nginx/#{file} | #{sed} > #{ngout}/#{file}"
+      exec cmd, (err) -> throw err if err
+      # TODO: is this async? Could it trigger a race condition?
+    exec "nginx -c #{process.cwd()}/target/nginx/nginx.conf"
+
+task 'nginx:stop', 'stop nginx', (options) ->
+  exec 'nginx -s quit', (err) -> throw err if err
