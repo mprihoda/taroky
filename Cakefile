@@ -1,5 +1,6 @@
 fs = require 'fs'
 util = require 'util'
+console = require 'console'
 {exec, spawn} = require 'child_process'
 
 out = 'target'
@@ -12,7 +13,12 @@ coffee_src = "#{main_src}/coffee"
 js_src = "#{coffee_src}/js"
 stylus_src = "#{main_src}/stylus"
 
-coffee_files_in = (dir) -> (file for file in fs.readdirSync dir when file.match(/\.coffee$/))
+files_in = (dir, pattern) -> ({name: file, path: "#{dir}/#{file}"} for file in fs.readdirSync dir when file.match(pattern))
+coffee_files_in = (dir) -> files_in dir, /\.coffee$/
+stylus_files_in = (dir) -> files_in dir, /\.styl$/
+
+paths_of = (files) -> (file.path for file in files)
+names_of = (files) -> (file.name for file in files)
 
 task 'build', 'build the sources', (options) ->
   invoke 'resources'
@@ -20,33 +26,49 @@ task 'build', 'build the sources', (options) ->
   invoke 'build:js'
   invoke 'build:html'
 
+task 'watch', 'watch the sources and compile when changed', (options) ->
+  invoke 'build'
+  scripts = paths_of coffee_files_in js_src
+  tmpls = paths_of coffee_files_in coffee_src
+  styles = paths_of stylus_files_in stylus_src
+  execs = {
+    coffee: ["-o", "#{dest}/js", "-w", "-c"].concat(scripts)
+    coffeekup: ["-o", "#{dest}", "-w"].concat(tmpls)
+    stylus: ["-o", "#{dest}/css", "-w"].concat(styles)
+  }
+  children = for exe, args of execs
+    x = spawn exe, args
+    x.stdout.on 'data', (data) -> process.stdout.write data
+    x
+  util.log 'Press enter to exit.'
+  process.stdin.resume()
+  process.stdin.on 'keypress', (char, key) ->
+    util.log "Exiting."
+    for ch in children then ch.kill()
+    process.exit 0
+
 task 'build:html', 'build html only', (options) ->
   exec "mkdir -p #{dest}", (err, stdout, stderr) ->
     throw err if err
-    for input in coffee_files_in coffee_src
-      exec "coffeekup #{coffee_src}/#{input}", (err, stdout, stderr) ->
-        if err
-          exec "rm #{coffee_src}/*.html", (err2) ->
-            throw err
-        else
-          exec "mv #{coffee_src}/*.html #{dest}", (err) ->
-            throw err if err
+    for input in paths_of coffee_files_in coffee_src
+      exec "coffeekup -o #{dest} #{input}", (err, stdout, stderr) ->
+        throw err if err
 
 task 'build:js', 'build javascript only', (options) ->
   tgt = "#{dest}/js"
   exec "mkdir -p #{tgt}", (err, stdout, stderr) ->
     throw err if err
-    for input in coffee_files_in js_src
-      exec "coffee -c -o #{tgt} #{js_src}/#{input}", (err, stdout, stderr) ->
+    for input in paths_of coffee_files_in js_src
+      exec "coffee -c -o #{tgt} #{input}", (err, stdout, stderr) ->
         throw err if err
 
 task 'build:css', 'build css files only', (options) ->
   tgt = "#{dest}/css"
   exec "mkdir -p #{tgt}", (err, stdout, stderr) ->
     throw err if err
-    files = (file for file in fs.readdirSync "#{stylus_src}/css" when file.match(/\.styl$/))
-    for input in files
-      exec "stylus -o #{tgt} #{stylus_src}/css/#{input}", (err) ->
+    files = (file for file in stylus_files_in "#{stylus_src}/css")
+    for input in paths_of stylus_files_in "#{stylus_src}/css"
+      exec "stylus -o #{tgt} #{input}", (err) ->
         throw err if err
 
 task 'resources', 'copy the resources to target dir', (options) ->
