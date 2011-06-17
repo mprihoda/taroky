@@ -10,6 +10,8 @@ src = 'src'
 main_src = "#{src}/main"
 test_src = "#{src}/test"
 coffee_src = "#{main_src}/coffee"
+coffe_test_src="#{test_src}/coffee"
+test_resources="#{test_src}/resources"
 js_src = "#{coffee_src}/js"
 stylus_src = "#{main_src}/stylus"
 
@@ -20,31 +22,51 @@ stylus_files_in = (dir) -> files_in dir, /\.styl$/
 paths_of = (files) -> (file.path for file in files)
 names_of = (files) -> (file.name for file in files)
 
+copy_resources = (s, d) ->
+  exec "mkdir -p #{d} && cp -rf #{s}/* #{d}", (err) ->
+    throw err if err
+
+compile_coffee = (s, d) ->
+  exec "mkdir -p #{d}", (err, stdout, stderr) ->
+    throw err if err
+    for input in paths_of coffee_files_in s
+      exec "coffee -c -o #{d} #{input}", (err, stdout, stderr) ->
+        throw err if err
+
 task 'build', 'build the sources', (options) ->
   invoke 'resources'
   invoke 'build:css'
   invoke 'build:js'
   invoke 'build:html'
+  invoke 'tests:build'
 
 task 'watch', 'watch the sources and compile when changed', (options) ->
   invoke 'build'
   scripts = paths_of coffee_files_in js_src
+  tests = paths_of coffee_files_in coffe_test_src
   tmpls = paths_of coffee_files_in coffee_src
   styles = paths_of stylus_files_in stylus_src
   execs = {
-    coffee: ["-o", "#{dest}/js", "-w", "-c"].concat(scripts)
-    coffeekup: ["-o", "#{dest}", "-w"].concat(tmpls)
-    stylus: ["-o", "#{dest}/css", "-w"].concat(styles)
+    coffee: [
+      ["-o", "#{dest}/js", "-w", "-c"].concat(scripts),
+      ["-o", "#{out}/tests", "-w", "-c"].concat(tests)
+    ]
+    coffeekup: [["-o", "#{dest}", "-w"].concat(tmpls)]
+    stylus: [["-o", "#{dest}/css", "-w"].concat(styles)]
   }
-  children = for exe, args of execs
-    x = spawn exe, args
-    x.stdout.on 'data', (data) -> process.stdout.write data
-    x
+  children = []
+  for exe, args of execs
+    for a in args
+      x = spawn exe, a
+      x.stdout.on 'data', (data) -> process.stdout.write data
+      children.push x
   util.log 'Press enter to exit.'
+  invoke 'nginx:start'
   process.stdin.resume()
   process.stdin.on 'keypress', (char, key) ->
     util.log "Exiting."
     for ch in children then ch.kill()
+    invoke 'nginx:stop'
     process.exit 0
 
 task 'build:html', 'build html only', (options) ->
@@ -55,12 +77,7 @@ task 'build:html', 'build html only', (options) ->
         throw err if err
 
 task 'build:js', 'build javascript only', (options) ->
-  tgt = "#{dest}/js"
-  exec "mkdir -p #{tgt}", (err, stdout, stderr) ->
-    throw err if err
-    for input in paths_of coffee_files_in js_src
-      exec "coffee -c -o #{tgt} #{input}", (err, stdout, stderr) ->
-        throw err if err
+  compile_coffee js_src, "#{dest}/js"
 
 task 'build:css', 'build css files only', (options) ->
   tgt = "#{dest}/css"
@@ -72,12 +89,20 @@ task 'build:css', 'build css files only', (options) ->
         throw err if err
 
 task 'resources', 'copy the resources to target dir', (options) ->
-  source = "#{main_src}/resources"
-  exec "mkdir -p #{dest} && cp -rf #{source}/* #{dest}", (err) ->
-    throw err if err
+  copy_resources "#{main_src}/resources", "#{dest}"
+
+task 'tests:build', 'build the tests', (options) ->
+  invoke 'tests:resources'
+  invoke 'tests:coffee'
+
+task 'tests:resources', 'copy the test resources', (options) ->
+  copy_resources "#{test_src}/resources", "#{out}/tests"
+
+task 'tests:coffee', 'compile the test coffee scripts', (options) ->
+  compile_coffee coffe_test_src, "#{out}/tests"
 
 task 'clean', 'clean the output directory', (options) ->
-  exec "rm -rf #{dest}", (err) ->
+  exec "rm -rf #{out}", (err) ->
     throw err if err
 
 task 'nginx:start', 'run nginx', (options) ->
