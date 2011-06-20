@@ -296,6 +296,10 @@ $ ->
 
     commit: ->
       @slots.commit()
+      baton = @get("baton")
+      baton = baton + 1
+      baton = 1 if baton > 4
+      @save({baton})
       @reset()
 
   class window.HistoryLine extends Backbone.Model
@@ -405,6 +409,7 @@ $ ->
       "change #pagat": "setPagat"
       "change #pagat_flek": "setPagatFlek"
       "change #pagat_uhrany": "setPagatUhrany"
+      "click .baton": "setBaton"
 
     initialize: ->
       slots = new PlayerSlots()
@@ -438,6 +443,7 @@ $ ->
       @$("#pagat").val(@game.pagat())
       @$("#pagat_flek").val(@game.get("pagat_flek"))
       @$("#pagat_uhrany").val(@game.get("pagat_played"))
+      @$(".baton").filter("[value=#{@game.get('baton')}]").attr("checked", "checked")
       @validate()
 
     validate: ->
@@ -529,5 +535,8 @@ $ ->
 
     setPagatUhrany: ->
       @valToGameInt("pagat_uhrany", "pagat_played")
+
+    setBaton: (b) ->
+      @game.save baton: parseInt($(b.target).val())
 
   window.session = new GameView
