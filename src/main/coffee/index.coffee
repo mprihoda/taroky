@@ -16,7 +16,10 @@ zavazujici = (id) ->
 
 player_row = (id) ->
   li id: "player#{id}", ->
-    input class: 'licitator', type: 'checkbox'
+    div ->
+      input class: 'baton', type: 'radio', name: 'baton', value: "#{id}"
+    div ->
+      input class: 'licitator', type: 'checkbox'
     div class: 'player-name', ->
       div class: 'display'
       div class: 'edit', ->
@@ -101,7 +104,10 @@ html class: 'no-js', lang: 'en', ->
         div id: 'players', ->
           ul id: 'player-list', ->
             li id: 'jew', ->
-              input class: 'licitator', disabled: 'disabled', type: 'checkbox'
+              div ->
+                input class: 'baton', disabled: 'disabled', type: 'radio', value: 'jew'
+              div ->
+                input class: 'licitator', disabled: 'disabled', type: 'checkbox'
               div class: 'player-name', ->
                 div class: 'display', "Žid"
               div class: 'field', ->
