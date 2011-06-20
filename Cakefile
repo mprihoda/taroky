@@ -45,7 +45,7 @@ task 'watch', 'watch the sources and compile when changed', (options) ->
   scripts = paths_of coffee_files_in js_src
   tests = paths_of coffee_files_in coffe_test_src
   tmpls = paths_of coffee_files_in coffee_src
-  styles = paths_of stylus_files_in stylus_src
+  styles = paths_of stylus_files_in "#{stylus_src}/css"
   execs = {
     coffee: [
       ["-o", "#{dest}/js", "-w", "-c"].concat(scripts),
