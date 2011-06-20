@@ -1,5 +1,7 @@
 # Počítadlo taroků
 
+Verze: 0.2
+
 ## Použité technologie
 
 CoffeeScript <http://jashkenas.github.com/coffee-script/>
